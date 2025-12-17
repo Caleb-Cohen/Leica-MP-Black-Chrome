@@ -2,44 +2,67 @@
 
 Monitor retailer listings for the Leica MP Black Chrome and send Discord alerts whenever new matches appear.
 
-## Features
-- Polls multiple Leica retailers (`mapcamera.com`, `tamarkin.com`, `camerawest.com`, `kitamuracamera.jp`).
-- Filters listings for “Leica MP” plus Black Chrome keyword variants, including mixed-language titles.
-- Deduplicates alerts with on-disk state tracking.
-- Ships with Docker setup for easy deployment on Synology NAS.
+**Current Status: Phase 0 (Scaffolding)** - This project is being developed in phases. Currently, only the basic project structure, configuration, logging, and CLI entry point are implemented.
+
+## Development Phases
+
+- **Phase 0** (Current): Minimal scaffolding - project structure, config loader, logging, CLI entry point
+- **Phase 1**: Single retailer scraper with console output
+- **Phase 2**: Local state persistence and deduplication
+- **Phase 3**: Discord webhook notifications
+- **Phase 4**: Second retailer and shared abstractions
+- **Phase 5**: Docker and Synology deployment
 
 ## Quick Start
-1. Copy `.env.example` to `.env` and provide poll interval, Discord webhook URL, and any site overrides.
-2. Install dependencies and run the monitor:
+
+1. Create a virtual environment and install dependencies:
    ```bash
-   python -m venv .venv
+   python3 -m venv .venv
    source .venv/bin/activate
    pip install -r requirements.txt
-   python -m monitor run
    ```
 
-## Docker
-1. Build the image:
+2. (Optional) Copy `.env.example` to `.env` for configuration:
    ```bash
-   docker build -t leica-monitor .
+   cp .env.example .env
    ```
-2. Run on Synology (replace `/path/to/config` with your volume mapping):
+
+3. Run the monitor:
    ```bash
-   docker run -d --name leica-monitor --env-file /path/to/config/.env leica-monitor
+   python3 -m monitor
    ```
+
+**Note:** Phase 0 is a placeholder that logs startup/shutdown messages. No scraping, notifications, or persistence is implemented yet.
 
 ## Configuration
-- `DISCORD_WEBHOOK_URL`: Discord endpoint for stock alerts.
-- `POLL_INTERVAL_SECONDS`: Interval between polls (defaults to 600).
-- `SITE_*` vars: Optional per-site toggles, pagination limits, or locale overrides.
 
-## Testing
-```bash
-pytest
+Configuration is loaded from a `.env` file (optional in Phase 0). See `.env.example` for available options. Configuration variables will be added in later phases:
+
+- **Phase 1**: `POLL_INTERVAL_SECONDS` - Poll interval in seconds
+- **Phase 2**: `STATE_FILE_PATH` - Path to state persistence file
+- **Phase 3**: `DISCORD_WEBHOOK_URL` - Discord webhook endpoint
+
+## Project Structure
+
+```
+monitor/
+  ├── __init__.py      # Logging configuration
+  ├── __main__.py      # CLI entry point
+  ├── cli.py           # Main run() function
+  ├── config.py        # Configuration loader
+  └── scrapers/        # (Phase 1+) Retailer scrapers
 ```
 
-## Roadmap
-- Add more retailers and structured listing parsing.
-- Extend keyword matching with fuzzy search and localized synonyms.
-- Surface richer metadata (condition, price history, images) in alerts.
+## Requirements
+
+- Python 3.12+
+- `python-dotenv` (for .env file loading)
+
+## Future Features
+
+- Poll multiple Leica retailers (`mapcamera.com`, `tamarkin.com`, `camerawest.com`, `kitamuracamera.jp`)
+- Filter listings for "Leica MP" plus Black Chrome keyword variants
+- Deduplicate alerts with on-disk state tracking
+- Discord webhook notifications
+- Docker setup for Synology NAS deployment
 

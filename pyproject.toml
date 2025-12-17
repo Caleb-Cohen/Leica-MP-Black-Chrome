@@ -1,0 +1,6 @@
+[project]
+name = "leica-tracker"
+version = "0.1.0"
+description = "Monitor Leica MP Black Chrome stock across multiple retailers"
+requires-python = ">=3.12"
+
