@@ -4,3 +4,42 @@ version = "0.1.0"
 description = "Monitor Leica MP Black Chrome stock across multiple retailers"
 requires-python = ">=3.12"
 
+[tool.ruff]
+# Enable linting and formatting
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "PERF", # performance
+    "SIM",  # simplify
+    "RUF",  # ruff-specific rules
+    "PTH",  # pathlib
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # do not perform function calls in argument defaults
+    "PERF401", # using a list comprehension to unpack into a for-loop target (can be noisy)
+    "SIM108",  # use ternary operator instead of if-else-block (can reduce readability)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["monitor"]
+
+[tool.ruff.format]
+# Use double quotes for strings
+quote-style = "double"
+# Use spaces for indentation
+indent-style = "space"
+# Respect magic trailing comma
+skip-magic-trailing-comma = false
+# Automatically detect the appropriate line ending
+line-ending = "auto"
+

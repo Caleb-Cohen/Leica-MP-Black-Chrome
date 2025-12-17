@@ -1,0 +1,12 @@
+# Development dependencies
+# Install with: pip install -r requirements-dev.txt
+#
+# Note: Pre-commit hooks use their own Ruff version (see .pre-commit-config.yaml)
+# This version is for local development use
+
+# Linting and formatting
+ruff>=0.6.0,<1.0.0
+
+# Pre-commit hooks
+pre-commit>=3.0.0
+

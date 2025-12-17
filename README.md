@@ -58,6 +58,66 @@ monitor/
 - Python 3.12+
 - `python-dotenv` (for .env file loading)
 
+**Development dependencies** (optional, for linting/formatting):
+- Install with: `pip install -r requirements-dev.txt`
+
+## Development
+
+### Linting and Formatting
+
+This project uses [Ruff](https://docs.astral.sh/ruff/) for both linting and code formatting.
+
+**Check for issues:**
+```bash
+python3 -m ruff check monitor/
+```
+
+**Auto-fix issues:**
+```bash
+python3 -m ruff check --fix monitor/
+```
+
+**Format code:**
+```bash
+python3 -m ruff format monitor/
+```
+
+**Check and format in one command:**
+```bash
+python3 -m ruff check --fix monitor/ && python3 -m ruff format monitor/
+```
+
+Configuration is in `pyproject.toml` under `[tool.ruff]`.
+
+### Pre-commit Hooks
+
+This project uses [pre-commit](https://pre-commit.com/) to automatically run Ruff linting and formatting before each commit.
+
+**First-time setup:**
+```bash
+# Install development dependencies (includes pre-commit)
+pip install -r requirements-dev.txt
+
+# Install git hooks
+pre-commit install
+```
+
+After installation, pre-commit will automatically:
+- Run Ruff linting (with auto-fix)
+- Run Ruff formatting
+
+on every `git commit`. If issues are found, the commit will be blocked until they're fixed.
+
+**Run hooks manually (without committing):**
+```bash
+pre-commit run --all-files
+```
+
+**Skip hooks (not recommended):**
+```bash
+git commit --no-verify
+```
+
 ## Future Features
 
 - Poll multiple Leica retailers (`mapcamera.com`, `tamarkin.com`, `camerawest.com`, `kitamuracamera.jp`)
