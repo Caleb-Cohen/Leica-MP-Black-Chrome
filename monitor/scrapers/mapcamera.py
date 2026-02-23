@@ -1,4 +1,10 @@
-"""MapCamera scraper (Japanese camera retailer)."""
+"""MapCamera scraper (Japanese camera retailer).
+
+NOTE: MapCamera is protected by Akamai Bot Manager and currently blocks all
+automated requests.  This scraper is intentionally excluded from the main
+monitor loop until a reliable fetch strategy is implemented.  The parsing
+logic and tests are kept here so they stay current with the site structure.
+"""
 
 from __future__ import annotations
 
@@ -35,8 +41,6 @@ class MapCameraScraper(BaseScraper):
         soup = BeautifulSoup(resp.text, "html.parser")
         listings = []
 
-        # MapCamera uses product cards/items in search results
-        # Try multiple common selectors for product listings
         items = (
             soup.select(".p-item")
             or soup.select(".product-item")
@@ -46,7 +50,6 @@ class MapCameraScraper(BaseScraper):
         )
 
         if not items:
-            # Fallback: look for any links containing product-like patterns
             logger.warning("MapCamera: no product items found with known selectors, trying links")
             for link in soup.select("a[href*='/item/'], a[href*='/product/']"):
                 title = link.get_text(strip=True)
@@ -56,7 +59,6 @@ class MapCameraScraper(BaseScraper):
                     listings.append(Listing(title=title, url=url, price=None, source=self.name))
         else:
             for item in items:
-                # Extract title from link or heading
                 link = item.select_one("a")
                 title_el = item.select_one(
                     "[class*='name'], [class*='title'], h2, h3, .p-item__name"
@@ -71,13 +73,9 @@ class MapCameraScraper(BaseScraper):
                 if not title:
                     continue
 
-                # Extract URL
-                href = ""
-                if link:
-                    href = link.get("href", "")
+                href = link.get("href", "") if link else ""
                 url = href if href.startswith("http") else f"{self.base_url}{href}"
 
-                # Extract price
                 price_el = item.select_one("[class*='price']")
                 price = price_el.get_text(strip=True) if price_el else None
 

@@ -6,7 +6,7 @@ from typing import Any
 
 from monitor.discord import DiscordNotifier
 from monitor.filtering import is_black_chrome
-from monitor.scrapers import CameraWestScraper, FredMirandaScraper, MapCameraScraper
+from monitor.scrapers import CameraWestScraper, FredMirandaScraper
 from monitor.state import StateManager
 
 logger = logging.getLogger(__name__)
@@ -24,11 +24,13 @@ def run(config: dict[str, Any]) -> None:
 
     scrapers = [
         CameraWestScraper(config),
-        MapCameraScraper(config),
         FredMirandaScraper(config),
+        # MapCamera excluded — blocked by Akamai Bot Manager.
+        # Re-enable once a bypass strategy is confirmed working.
     ]
 
     logger.info("Starting monitor — polling every %ds", interval)
+    logger.info("Active scrapers: %s", [s.name for s in scrapers])
 
     try:
         while True:

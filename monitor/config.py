@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 def get_config() -> dict[str, Any]:
     """Load configuration from .env file and return as dictionary."""
-    # Load .env file if python-dotenv is available
     env_path = Path(".env")
     if load_dotenv and env_path.exists():
         load_dotenv(env_path)
@@ -29,11 +28,10 @@ def get_config() -> dict[str, Any]:
         "CAMERAWEST_SEARCH_URL",
         "CAMERAWEST_SEARCH_QUERY",
         "CAMERAWEST_BASE_URL",
-        "MAPCAMERA_SEARCH_URL",
-        "MAPCAMERA_SEARCH_KEYWORD",
-        "MAPCAMERA_BASE_URL",
         "FREDMIRANDA_FORUM_URL",
         "FREDMIRANDA_BASE_URL",
+        # MapCamera is temporarily disabled (Akamai Bot Manager blocks automated
+        # requests).  Its vars are optional until a bypass is in place.
     ]
 
     missing = [key for key in required if not os.getenv(key)]
@@ -49,9 +47,6 @@ def get_config() -> dict[str, Any]:
         "camerawest_search_url": os.environ["CAMERAWEST_SEARCH_URL"],
         "camerawest_search_query": os.environ["CAMERAWEST_SEARCH_QUERY"],
         "camerawest_base_url": os.environ["CAMERAWEST_BASE_URL"],
-        "mapcamera_search_url": os.environ["MAPCAMERA_SEARCH_URL"],
-        "mapcamera_search_keyword": os.environ["MAPCAMERA_SEARCH_KEYWORD"],
-        "mapcamera_base_url": os.environ["MAPCAMERA_BASE_URL"],
         "fredmiranda_forum_url": os.environ["FREDMIRANDA_FORUM_URL"],
         "fredmiranda_base_url": os.environ["FREDMIRANDA_BASE_URL"],
     }
