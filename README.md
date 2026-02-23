@@ -35,28 +35,21 @@ Polls three camera retailers/forums for Leica MP Black Chrome listings and sends
 
 ## Configuration
 
-All config is via `.env` (or environment variables in Docker).
+All config is via `.env`. Every variable is required — the monitor will exit on startup if any are missing. See `.env.example` for a complete template.
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `DISCORD_WEBHOOK_URL` | Yes | — | Discord webhook endpoint |
-| `DISCORD_USER_ID` | Yes | — | Your Discord user ID (tagged on match) |
-| `POLL_INTERVAL_SECONDS` | No | `300` | Seconds between poll cycles |
-
-### Scraper URLs (optional overrides)
-
-These have sensible defaults built in. Override only if a site changes its URL structure.
-
-| Variable | Default |
-|----------|---------|
-| `CAMERAWEST_SEARCH_URL` | `https://camerawest.com/search/suggest.json` |
-| `CAMERAWEST_SEARCH_QUERY` | `leica mp` |
-| `CAMERAWEST_BASE_URL` | `https://camerawest.com/products/` |
-| `MAPCAMERA_SEARCH_URL` | `https://www.mapcamera.com/search` |
-| `MAPCAMERA_SEARCH_KEYWORD` | `leica mp` |
-| `MAPCAMERA_BASE_URL` | `https://www.mapcamera.com` |
-| `FREDMIRANDA_FORUM_URL` | `https://fredmiranda.com/forum/board/10/` |
-| `FREDMIRANDA_BASE_URL` | `https://fredmiranda.com` |
+| Variable | Description |
+|----------|-------------|
+| `DISCORD_WEBHOOK_URL` | Discord webhook endpoint |
+| `DISCORD_USER_ID` | Your Discord user ID (tagged on match) |
+| `POLL_INTERVAL_SECONDS` | Seconds between poll cycles |
+| `CAMERAWEST_SEARCH_URL` | Camera West search API endpoint |
+| `CAMERAWEST_SEARCH_QUERY` | Camera West search query |
+| `CAMERAWEST_BASE_URL` | Camera West product URL prefix |
+| `MAPCAMERA_SEARCH_URL` | MapCamera search endpoint |
+| `MAPCAMERA_SEARCH_KEYWORD` | MapCamera search keyword |
+| `MAPCAMERA_BASE_URL` | MapCamera base URL |
+| `FREDMIRANDA_FORUM_URL` | Fred Miranda forum board URL |
+| `FREDMIRANDA_BASE_URL` | Fred Miranda base URL |
 
 ## Project Structure
 

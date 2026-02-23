@@ -27,43 +27,36 @@ def get_config() -> dict[str, Any]:
     else:
         logger.warning("python-dotenv not installed, using environment variables only")
 
-    config: dict[str, Any] = {}
+    required = [
+        "DISCORD_WEBHOOK_URL",
+        "DISCORD_USER_ID",
+        "POLL_INTERVAL_SECONDS",
+        "CAMERAWEST_SEARCH_URL",
+        "CAMERAWEST_SEARCH_QUERY",
+        "CAMERAWEST_BASE_URL",
+        "MAPCAMERA_SEARCH_URL",
+        "MAPCAMERA_SEARCH_KEYWORD",
+        "MAPCAMERA_BASE_URL",
+        "FREDMIRANDA_FORUM_URL",
+        "FREDMIRANDA_BASE_URL",
+    ]
 
-    # Discord webhook URL (required)
-    config["discord_webhook_url"] = os.getenv("DISCORD_WEBHOOK_URL", "")
-    if not config["discord_webhook_url"]:
-        logger.error("DISCORD_WEBHOOK_URL is required but not set")
+    missing = [key for key in required if not os.getenv(key)]
+    if missing:
+        for key in missing:
+            logger.error("Missing required env var: %s", key)
         sys.exit(1)
 
-    # Discord user ID to tag on match (required)
-    config["discord_user_id"] = os.getenv("DISCORD_USER_ID", "")
-    if not config["discord_user_id"]:
-        logger.error("DISCORD_USER_ID is required but not set")
-        sys.exit(1)
-
-    # Poll interval in seconds (default: 5 minutes)
-    config["poll_interval_seconds"] = int(os.getenv("POLL_INTERVAL_SECONDS", "300"))
-
-    # Camera West
-    config["camerawest_search_url"] = os.getenv(
-        "CAMERAWEST_SEARCH_URL", "https://camerawest.com/search/suggest.json"
-    )
-    config["camerawest_search_query"] = os.getenv("CAMERAWEST_SEARCH_QUERY", "leica mp")
-    config["camerawest_base_url"] = os.getenv(
-        "CAMERAWEST_BASE_URL", "https://camerawest.com/products/"
-    )
-
-    # MapCamera
-    config["mapcamera_search_url"] = os.getenv(
-        "MAPCAMERA_SEARCH_URL", "https://www.mapcamera.com/search"
-    )
-    config["mapcamera_search_keyword"] = os.getenv("MAPCAMERA_SEARCH_KEYWORD", "leica mp")
-    config["mapcamera_base_url"] = os.getenv("MAPCAMERA_BASE_URL", "https://www.mapcamera.com")
-
-    # Fred Miranda
-    config["fredmiranda_forum_url"] = os.getenv(
-        "FREDMIRANDA_FORUM_URL", "https://fredmiranda.com/forum/board/10/"
-    )
-    config["fredmiranda_base_url"] = os.getenv("FREDMIRANDA_BASE_URL", "https://fredmiranda.com")
-
-    return config
+    return {
+        "discord_webhook_url": os.environ["DISCORD_WEBHOOK_URL"],
+        "discord_user_id": os.environ["DISCORD_USER_ID"],
+        "poll_interval_seconds": int(os.environ["POLL_INTERVAL_SECONDS"]),
+        "camerawest_search_url": os.environ["CAMERAWEST_SEARCH_URL"],
+        "camerawest_search_query": os.environ["CAMERAWEST_SEARCH_QUERY"],
+        "camerawest_base_url": os.environ["CAMERAWEST_BASE_URL"],
+        "mapcamera_search_url": os.environ["MAPCAMERA_SEARCH_URL"],
+        "mapcamera_search_keyword": os.environ["MAPCAMERA_SEARCH_KEYWORD"],
+        "mapcamera_base_url": os.environ["MAPCAMERA_BASE_URL"],
+        "fredmiranda_forum_url": os.environ["FREDMIRANDA_FORUM_URL"],
+        "fredmiranda_base_url": os.environ["FREDMIRANDA_BASE_URL"],
+    }
