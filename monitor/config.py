@@ -1,6 +1,8 @@
 """Configuration loader for the monitor."""
 
 import logging
+import os
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -13,32 +15,38 @@ logger = logging.getLogger(__name__)
 
 
 def get_config() -> dict[str, Any]:
-    """
-    Load configuration from .env file and return as dictionary.
-
-    Returns:
-        Dictionary of configuration values with defaults.
-    """
-    config = {}
-
-    # Load .env file if python-dotenv is available
+    """Load configuration from .env file and return as dictionary."""
     env_path = Path(".env")
-    if load_dotenv:
-        if env_path.exists():
-            load_dotenv(env_path)
-            logger.info("Loaded configuration from .env file")
-        else:
-            logger.warning(".env file not found, using defaults")
-    else:
-        logger.warning("python-dotenv not installed, using environment variables only")
+    if load_dotenv and env_path.exists():
+        load_dotenv(env_path)
+        logger.info("Loaded configuration from .env file")
 
-    # TODO Phase 1: Add POLL_INTERVAL_SECONDS config
-    # config["poll_interval_seconds"] = int(os.getenv("POLL_INTERVAL_SECONDS", "600"))
+    required = [
+        "DISCORD_WEBHOOK_URL",
+        "DISCORD_USER_ID",
+        "POLL_INTERVAL_SECONDS",
+        "CAMERAWEST_SEARCH_URL",
+        "CAMERAWEST_SEARCH_QUERY",
+        "CAMERAWEST_BASE_URL",
+        "FREDMIRANDA_FORUM_URL",
+        "FREDMIRANDA_BASE_URL",
+        # MapCamera is temporarily disabled (Akamai Bot Manager blocks automated
+        # requests).  Its vars are optional until a bypass is in place.
+    ]
 
-    # TODO Phase 2: Add STATE_FILE_PATH config
-    # config["state_file_path"] = os.getenv("STATE_FILE_PATH", "state.json")
+    missing = [key for key in required if not os.getenv(key)]
+    if missing:
+        for key in missing:
+            logger.error("Missing required env var: %s", key)
+        sys.exit(1)
 
-    # TODO Phase 3: Add DISCORD_WEBHOOK_URL config
-    # config["discord_webhook_url"] = os.getenv("DISCORD_WEBHOOK_URL", "")
-
-    return config
+    return {
+        "discord_webhook_url": os.environ["DISCORD_WEBHOOK_URL"],
+        "discord_user_id": os.environ["DISCORD_USER_ID"],
+        "poll_interval_seconds": int(os.environ["POLL_INTERVAL_SECONDS"]),
+        "camerawest_search_url": os.environ["CAMERAWEST_SEARCH_URL"],
+        "camerawest_search_query": os.environ["CAMERAWEST_SEARCH_QUERY"],
+        "camerawest_base_url": os.environ["CAMERAWEST_BASE_URL"],
+        "fredmiranda_forum_url": os.environ["FREDMIRANDA_FORUM_URL"],
+        "fredmiranda_base_url": os.environ["FREDMIRANDA_BASE_URL"],
+    }

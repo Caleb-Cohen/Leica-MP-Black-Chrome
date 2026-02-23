@@ -1,0 +1,63 @@
+"""Fred Miranda Buy & Sell forum scraper."""
+
+from __future__ import annotations
+
+import logging
+
+from bs4 import BeautifulSoup
+
+from monitor.scrapers.base import BaseScraper, Listing
+
+logger = logging.getLogger(__name__)
+
+
+class FredMirandaScraper(BaseScraper):
+    """Scrape Fred Miranda Buy & Sell forum thread titles."""
+
+    name = "Fred Miranda"
+
+    def __init__(self, config: dict) -> None:
+        super().__init__(config)
+        self.forum_url = config["fredmiranda_forum_url"]
+        self.base_url = config["fredmiranda_base_url"]
+
+    def scrape(self) -> list[Listing]:
+        logger.info("Scraping Fred Miranda...")
+        try:
+            resp = self.client.get(self.forum_url)
+            resp.raise_for_status()
+        except Exception:
+            logger.exception("Failed to fetch Fred Miranda")
+            return []
+
+        soup = BeautifulSoup(resp.text, "html.parser")
+        listings = []
+
+        # Fred Miranda forum threads are in table rows or list items
+        # Thread links typically point to /forum/topic/...
+        thread_links = soup.select("a[href*='/forum/topic/']")
+
+        seen_urls = set()
+        for link in thread_links:
+            title = link.get_text(strip=True)
+            href = link.get("href", "")
+
+            if not title:
+                continue
+
+            url = href if href.startswith("http") else f"{self.base_url}{href}"
+
+            # Deduplicate within this scrape (same thread can appear multiple times)
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+
+            # Only include threads that mention "leica mp" as a phrase
+            title_lower = title.lower()
+            if "leica mp" not in title_lower:
+                continue
+
+            listings.append(Listing(title=title, url=url, price=None, source=self.name))
+
+        logger.info("Fred Miranda: found %d raw listings", len(listings))
+        return listings

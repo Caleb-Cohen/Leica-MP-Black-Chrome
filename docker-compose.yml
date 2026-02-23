@@ -1,0 +1,10 @@
+services:
+  monitor:
+    build: .
+    env_file: .env
+    volumes:
+      - monitor-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  monitor-data:

@@ -43,6 +43,9 @@ htmlcov/
 # Logs
 *.log
 
+# State data
+data/
+
 # Planning
 le.plan.md
 
