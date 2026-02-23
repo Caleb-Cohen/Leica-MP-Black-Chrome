@@ -1,128 +1,102 @@
-# Leica MP Stock Monitor
+# Leica MP Black Chrome Stock Monitor
 
-Monitor retailer listings for the Leica MP Black Chrome and send Discord alerts whenever new matches appear.
+Polls three camera retailers/forums for Leica MP Black Chrome listings and sends Discord alerts when new matches appear. Designed to run on a Hetzner VPS via Docker.
 
-**Current Status: Phase 0 (Scaffolding)** - This project is being developed in phases. Currently, only the basic project structure, configuration, logging, and CLI entry point are implemented.
+## Sources
 
-## Development Phases
+- **Camera West** — Shopify search API (`camerawest.com`)
+- **MapCamera** — HTML scraping (`mapcamera.com`, Japanese retailer)
+- **Fred Miranda** — Buy & Sell forum thread titles (`fredmiranda.com/forum/board/10/`)
 
-- **Phase 0** (Current): Minimal scaffolding - project structure, config loader, logging, CLI entry point
-- **Phase 1**: Single retailer scraper with console output
-- **Phase 2**: Local state persistence and deduplication
-- **Phase 3**: Discord webhook notifications
-- **Phase 4**: Second retailer and shared abstractions
-- **Phase 5**: Docker and Synology deployment
+## How It Works
 
-## Quick Start
+1. Each poll cycle scrapes all three sources for listings mentioning "Leica MP"
+2. Filters results to match Black Chrome finish — rejects Black Paint, M-P (digital), and MP-240
+3. Checks against a local state file to find only *new* listings
+4. Sends a Discord status embed every cycle showing what was checked and match counts
+5. Tags your Discord user when a new Leica MP Black Chrome is found
 
-1. Create a virtual environment and install dependencies:
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
+## Setup
 
-2. (Optional) Copy `.env.example` to `.env` for configuration:
+1. Copy the example env file and fill in your values:
    ```bash
    cp .env.example .env
    ```
 
-3. Run the monitor:
+2. Run with Docker Compose:
    ```bash
-   python3 -m monitor
+   docker compose up -d --build
    ```
 
-**Note:** Phase 0 is a placeholder that logs startup/shutdown messages. No scraping, notifications, or persistence is implemented yet.
+3. Check logs:
+   ```bash
+   docker compose logs -f
+   ```
 
 ## Configuration
 
-Configuration is loaded from a `.env` file (optional in Phase 0). See `.env.example` for available options. Configuration variables will be added in later phases:
+All config is via `.env` (or environment variables in Docker).
 
-- **Phase 1**: `POLL_INTERVAL_SECONDS` - Poll interval in seconds
-- **Phase 2**: `STATE_FILE_PATH` - Path to state persistence file
-- **Phase 3**: `DISCORD_WEBHOOK_URL` - Discord webhook endpoint
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `DISCORD_WEBHOOK_URL` | Yes | — | Discord webhook endpoint |
+| `DISCORD_USER_ID` | Yes | — | Your Discord user ID (tagged on match) |
+| `POLL_INTERVAL_SECONDS` | No | `300` | Seconds between poll cycles |
+
+### Scraper URLs (optional overrides)
+
+These have sensible defaults built in. Override only if a site changes its URL structure.
+
+| Variable | Default |
+|----------|---------|
+| `CAMERAWEST_SEARCH_URL` | `https://camerawest.com/search/suggest.json` |
+| `CAMERAWEST_SEARCH_QUERY` | `leica mp` |
+| `CAMERAWEST_BASE_URL` | `https://camerawest.com/products/` |
+| `MAPCAMERA_SEARCH_URL` | `https://www.mapcamera.com/search` |
+| `MAPCAMERA_SEARCH_KEYWORD` | `leica mp` |
+| `MAPCAMERA_BASE_URL` | `https://www.mapcamera.com` |
+| `FREDMIRANDA_FORUM_URL` | `https://fredmiranda.com/forum/board/10/` |
+| `FREDMIRANDA_BASE_URL` | `https://fredmiranda.com` |
 
 ## Project Structure
 
 ```
 monitor/
-  ├── __init__.py      # Logging configuration
-  ├── __main__.py      # CLI entry point
-  ├── cli.py           # Main run() function
-  ├── config.py        # Configuration loader
-  └── scrapers/        # (Phase 1+) Retailer scrapers
+├── __init__.py              # Logging setup
+├── __main__.py              # Entry point
+├── cli.py                   # Main polling loop
+├── config.py                # Loads .env configuration
+├── discord.py               # Discord webhook notifications
+├── filtering.py             # Black Chrome vs Black Paint filter
+├── state.py                 # JSON deduplication state
+└── scrapers/
+    ├── base.py              # Listing dataclass & base scraper
+    ├── camerawest.py        # Camera West (Shopify JSON API)
+    ├── mapcamera.py         # MapCamera (HTML parsing)
+    └── fredmiranda.py       # Fred Miranda (forum thread titles)
+Dockerfile
+docker-compose.yml
 ```
-
-## Requirements
-
-- Python 3.12+
-- `python-dotenv` (for .env file loading)
-
-**Development dependencies** (optional, for linting/formatting):
-- Install with: `pip install -r requirements-dev.txt`
 
 ## Development
 
-### Linting and Formatting
-
-This project uses [Ruff](https://docs.astral.sh/ruff/) for both linting and code formatting.
-
-**Check for issues:**
+Requires Python 3.12+. Install dependencies:
 ```bash
-python3 -m ruff check monitor/
+pip install -r requirements.txt
+pip install -r requirements-dev.txt  # ruff, pre-commit
 ```
 
-**Auto-fix issues:**
+Run locally (needs a valid `.env`):
 ```bash
-python3 -m ruff check --fix monitor/
+python -m monitor
 ```
 
-**Format code:**
+Lint and format:
 ```bash
-python3 -m ruff format monitor/
+ruff check monitor/ && ruff format monitor/
 ```
 
-**Check and format in one command:**
+Pre-commit hooks auto-run ruff on every commit:
 ```bash
-python3 -m ruff check --fix monitor/ && python3 -m ruff format monitor/
-```
-
-Configuration is in `pyproject.toml` under `[tool.ruff]`.
-
-### Pre-commit Hooks
-
-This project uses [pre-commit](https://pre-commit.com/) to automatically run Ruff linting and formatting before each commit.
-
-**First-time setup:**
-```bash
-# Install development dependencies (includes pre-commit)
-pip install -r requirements-dev.txt
-
-# Install git hooks
 pre-commit install
 ```
-
-After installation, pre-commit will automatically:
-- Run Ruff linting (with auto-fix)
-- Run Ruff formatting
-
-on every `git commit`. If issues are found, the commit will be blocked until they're fixed.
-
-**Run hooks manually (without committing):**
-```bash
-pre-commit run --all-files
-```
-
-**Skip hooks (not recommended):**
-```bash
-git commit --no-verify
-```
-
-## Future Features
-
-- Poll multiple Leica retailers (`mapcamera.com`, `tamarkin.com`, `camerawest.com`, `kitamuracamera.jp`)
-- Filter listings for "Leica MP" plus Black Chrome keyword variants
-- Deduplicate alerts with on-disk state tracking
-- Discord webhook notifications
-- Docker setup for Synology NAS deployment
-
