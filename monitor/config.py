@@ -18,14 +18,9 @@ def get_config() -> dict[str, Any]:
     """Load configuration from .env file and return as dictionary."""
     # Load .env file if python-dotenv is available
     env_path = Path(".env")
-    if load_dotenv:
-        if env_path.exists():
-            load_dotenv(env_path)
-            logger.info("Loaded configuration from .env file")
-        else:
-            logger.info("No .env file found, using environment variables")
-    else:
-        logger.warning("python-dotenv not installed, using environment variables only")
+    if load_dotenv and env_path.exists():
+        load_dotenv(env_path)
+        logger.info("Loaded configuration from .env file")
 
     required = [
         "DISCORD_WEBHOOK_URL",

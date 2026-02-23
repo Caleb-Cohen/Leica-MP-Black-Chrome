@@ -52,9 +52,9 @@ class FredMirandaScraper(BaseScraper):
                 continue
             seen_urls.add(url)
 
-            # Only include threads that mention both "leica" and "mp" in the title
+            # Only include threads that mention "leica mp" as a phrase
             title_lower = title.lower()
-            if "leica" not in title_lower or "mp" not in title_lower:
+            if "leica mp" not in title_lower:
                 continue
 
             listings.append(Listing(title=title, url=url, price=None, source=self.name))
