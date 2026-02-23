@@ -1,6 +1,8 @@
 """Configuration loader for the monitor."""
 
 import logging
+import os
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -13,14 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_config() -> dict[str, Any]:
-    """
-    Load configuration from .env file and return as dictionary.
-
-    Returns:
-        Dictionary of configuration values with defaults.
-    """
-    config = {}
-
+    """Load configuration from .env file and return as dictionary."""
     # Load .env file if python-dotenv is available
     env_path = Path(".env")
     if load_dotenv:
@@ -28,17 +23,25 @@ def get_config() -> dict[str, Any]:
             load_dotenv(env_path)
             logger.info("Loaded configuration from .env file")
         else:
-            logger.warning(".env file not found, using defaults")
+            logger.info("No .env file found, using environment variables")
     else:
         logger.warning("python-dotenv not installed, using environment variables only")
 
-    # TODO Phase 1: Add POLL_INTERVAL_SECONDS config
-    # config["poll_interval_seconds"] = int(os.getenv("POLL_INTERVAL_SECONDS", "600"))
+    config: dict[str, Any] = {}
 
-    # TODO Phase 2: Add STATE_FILE_PATH config
-    # config["state_file_path"] = os.getenv("STATE_FILE_PATH", "state.json")
+    # Discord webhook URL (required)
+    config["discord_webhook_url"] = os.getenv("DISCORD_WEBHOOK_URL", "")
+    if not config["discord_webhook_url"]:
+        logger.error("DISCORD_WEBHOOK_URL is required but not set")
+        sys.exit(1)
 
-    # TODO Phase 3: Add DISCORD_WEBHOOK_URL config
-    # config["discord_webhook_url"] = os.getenv("DISCORD_WEBHOOK_URL", "")
+    # Discord user ID to tag on match (required)
+    config["discord_user_id"] = os.getenv("DISCORD_USER_ID", "")
+    if not config["discord_user_id"]:
+        logger.error("DISCORD_USER_ID is required but not set")
+        sys.exit(1)
+
+    # Poll interval in seconds (default: 5 minutes)
+    config["poll_interval_seconds"] = int(os.getenv("POLL_INTERVAL_SECONDS", "300"))
 
     return config
