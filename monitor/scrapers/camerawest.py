@@ -8,20 +8,23 @@ from monitor.scrapers.base import BaseScraper, Listing
 
 logger = logging.getLogger(__name__)
 
-SEARCH_URL = "https://camerawest.com/search/suggest.json"
-SEARCH_PARAMS = {"q": "leica mp", "resources[type]": "product"}
-PRODUCT_BASE = "https://camerawest.com/products/"
-
 
 class CameraWestScraper(BaseScraper):
     """Scrape Camera West for Leica MP listings via Shopify suggest API."""
 
     name = "Camera West"
 
+    def __init__(self, config: dict) -> None:
+        super().__init__(config)
+        self.search_url = config["camerawest_search_url"]
+        self.search_query = config["camerawest_search_query"]
+        self.product_base = config["camerawest_base_url"]
+
     def scrape(self) -> list[Listing]:
         logger.info("Scraping Camera West...")
+        params = {"q": self.search_query, "resources[type]": "product"}
         try:
-            resp = self.client.get(SEARCH_URL, params=SEARCH_PARAMS)
+            resp = self.client.get(self.search_url, params=params)
             resp.raise_for_status()
         except Exception:
             logger.exception("Failed to fetch Camera West")
@@ -39,7 +42,7 @@ class CameraWestScraper(BaseScraper):
             title = product.get("title", "")
             handle = product.get("handle", "")
             price = product.get("price", "")
-            url = f"{PRODUCT_BASE}{handle}" if handle else product.get("url", "")
+            url = f"{self.product_base}{handle}" if handle else product.get("url", "")
 
             if price:
                 price = f"${price}" if not str(price).startswith("$") else price

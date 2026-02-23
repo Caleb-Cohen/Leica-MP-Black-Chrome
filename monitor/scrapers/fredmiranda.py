@@ -10,19 +10,21 @@ from monitor.scrapers.base import BaseScraper, Listing
 
 logger = logging.getLogger(__name__)
 
-FORUM_URL = "https://fredmiranda.com/forum/board/10/"
-BASE_URL = "https://fredmiranda.com"
-
 
 class FredMirandaScraper(BaseScraper):
     """Scrape Fred Miranda Buy & Sell forum thread titles."""
 
     name = "Fred Miranda"
 
+    def __init__(self, config: dict) -> None:
+        super().__init__(config)
+        self.forum_url = config["fredmiranda_forum_url"]
+        self.base_url = config["fredmiranda_base_url"]
+
     def scrape(self) -> list[Listing]:
         logger.info("Scraping Fred Miranda...")
         try:
-            resp = self.client.get(FORUM_URL)
+            resp = self.client.get(self.forum_url)
             resp.raise_for_status()
         except Exception:
             logger.exception("Failed to fetch Fred Miranda")
@@ -43,7 +45,7 @@ class FredMirandaScraper(BaseScraper):
             if not title:
                 continue
 
-            url = href if href.startswith("http") else f"{BASE_URL}{href}"
+            url = href if href.startswith("http") else f"{self.base_url}{href}"
 
             # Deduplicate within this scrape (same thread can appear multiple times)
             if url in seen_urls:

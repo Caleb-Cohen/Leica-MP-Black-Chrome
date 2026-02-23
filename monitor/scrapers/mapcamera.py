@@ -10,20 +10,23 @@ from monitor.scrapers.base import BaseScraper, Listing
 
 logger = logging.getLogger(__name__)
 
-SEARCH_URL = "https://www.mapcamera.com/search"
-SEARCH_PARAMS = {"keyword": "leica mp", "igngkeyword": "1"}
-BASE_URL = "https://www.mapcamera.com"
-
 
 class MapCameraScraper(BaseScraper):
     """Scrape MapCamera search results for Leica MP listings."""
 
     name = "MapCamera"
 
+    def __init__(self, config: dict) -> None:
+        super().__init__(config)
+        self.search_url = config["mapcamera_search_url"]
+        self.search_keyword = config["mapcamera_search_keyword"]
+        self.base_url = config["mapcamera_base_url"]
+
     def scrape(self) -> list[Listing]:
         logger.info("Scraping MapCamera...")
+        params = {"keyword": self.search_keyword, "igngkeyword": "1"}
         try:
-            resp = self.client.get(SEARCH_URL, params=SEARCH_PARAMS)
+            resp = self.client.get(self.search_url, params=params)
             resp.raise_for_status()
         except Exception:
             logger.exception("Failed to fetch MapCamera")
@@ -49,7 +52,7 @@ class MapCameraScraper(BaseScraper):
                 title = link.get_text(strip=True)
                 href = link.get("href", "")
                 if title and "leica" in title.lower():
-                    url = href if href.startswith("http") else f"{BASE_URL}{href}"
+                    url = href if href.startswith("http") else f"{self.base_url}{href}"
                     listings.append(Listing(title=title, url=url, price=None, source=self.name))
         else:
             for item in items:
@@ -72,7 +75,7 @@ class MapCameraScraper(BaseScraper):
                 href = ""
                 if link:
                     href = link.get("href", "")
-                url = href if href.startswith("http") else f"{BASE_URL}{href}"
+                url = href if href.startswith("http") else f"{self.base_url}{href}"
 
                 # Extract price
                 price_el = item.select_one("[class*='price']")

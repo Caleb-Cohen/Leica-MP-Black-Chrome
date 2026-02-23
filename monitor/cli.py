@@ -23,9 +23,9 @@ def run(config: dict[str, Any]) -> None:
     state = StateManager()
 
     scrapers = [
-        CameraWestScraper(),
-        MapCameraScraper(),
-        FredMirandaScraper(),
+        CameraWestScraper(config),
+        MapCameraScraper(config),
+        FredMirandaScraper(config),
     ]
 
     logger.info("Starting monitor — polling every %ds", interval)

@@ -36,7 +36,8 @@ class BaseScraper(ABC):
 
     name: str = "unknown"
 
-    def __init__(self) -> None:
+    def __init__(self, config: dict) -> None:
+        self.config = config
         self.client = httpx.Client(
             headers=DEFAULT_HEADERS,
             timeout=httpx.Timeout(connect=30.0, read=60.0, write=30.0, pool=30.0),

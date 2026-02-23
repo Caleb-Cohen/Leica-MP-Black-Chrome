@@ -44,4 +44,26 @@ def get_config() -> dict[str, Any]:
     # Poll interval in seconds (default: 5 minutes)
     config["poll_interval_seconds"] = int(os.getenv("POLL_INTERVAL_SECONDS", "300"))
 
+    # Camera West
+    config["camerawest_search_url"] = os.getenv(
+        "CAMERAWEST_SEARCH_URL", "https://camerawest.com/search/suggest.json"
+    )
+    config["camerawest_search_query"] = os.getenv("CAMERAWEST_SEARCH_QUERY", "leica mp")
+    config["camerawest_base_url"] = os.getenv(
+        "CAMERAWEST_BASE_URL", "https://camerawest.com/products/"
+    )
+
+    # MapCamera
+    config["mapcamera_search_url"] = os.getenv(
+        "MAPCAMERA_SEARCH_URL", "https://www.mapcamera.com/search"
+    )
+    config["mapcamera_search_keyword"] = os.getenv("MAPCAMERA_SEARCH_KEYWORD", "leica mp")
+    config["mapcamera_base_url"] = os.getenv("MAPCAMERA_BASE_URL", "https://www.mapcamera.com")
+
+    # Fred Miranda
+    config["fredmiranda_forum_url"] = os.getenv(
+        "FREDMIRANDA_FORUM_URL", "https://fredmiranda.com/forum/board/10/"
+    )
+    config["fredmiranda_base_url"] = os.getenv("FREDMIRANDA_BASE_URL", "https://fredmiranda.com")
+
     return config
